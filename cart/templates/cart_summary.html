@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+<!-- Header-->
+<header class="bg-dark py-1">
+    <div class="container px-4 px-lg-5 my-2">
+        <div class="text-center text-white">
+            <h1 class="display-4 fw-bolder">Your Shopping Cart</h1>
+            <p class="lead fw-normal text-white-50 mb-0">Manage your items and check out easily</p>
+        </div>
+    </div>
+</header>
+
+<!-- Cart Summary -->
+<div class="container mt-5">
+    {% if cart_products %}
+    <div class="row">
+        {% for product in cart_products %}
+        <div class="col-lg-12 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="row g-0">
+                    <div class="col-md-3">
+                        {% if product.image %}
+                        <img src="{{ product.image.url }}" class="img-fluid rounded-start" alt="{{ product.name }}">
+                        {% else %}
+                        <img src="{% static 'default_image.jpg' %}" class="img-fluid rounded-start" alt="No image available">
+                        {% endif %}
+                    </div>
+                    <div class="col-md-9">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            <p class="card-text text-muted">{{ product.description }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    {% if product.is_sale %}
+                                    <p class="text-danger mb-1"><strong>SALE!</strong></p>
+                                    <span class="text-muted text-decoration-line-through">₹{{ product.price }}</span>&nbsp;
+                                    <span class="text-success">₹{{ product.sale_price }}</span>
+                                    {% else %}
+                                    <span class="text-success">₹{{ product.price }}</span>
+                                    {% endif %}
+                                    <div class="d-flex align-items-center mb-3">
+                                        <label for="qty-cart" class="me-3">Quantity:</label>
+                                        <select class="form-select form-select-sm" id="select{{ product.id }}" name="quantity" style="width: auto;">
+                                            <option selected>
+                                                {% for key, value in quantities.items %}
+                                                    {% if key == product.id|slugify %}
+                                                        {{ value }}
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </option>
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                            <option value="5">5</option>
+                                            <option value="6">6</option>
+                                            <!-- You can dynamically generate these options if needed -->
+                                        </select>
+                                    </div>
+                                </div>
+                                <div>
+                                    <button type="button" data-index="{{ product.id }}" class="btn btn-outline-dark btn-sm update-cart">Update</button>
+                                    <button class="btn btn-outline-danger btn-sm delete-cart" data-index="{{ product.id }}">Remove</button>
+                                    <!-- <a href="{% url 'home' %}" data-index="{{ product.id }}" class="btn btn-outline-danger btn-sm delete-product" >Remove</a> -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="row mt-4">
+        <strong>Total : ₹ {{ totals }}</strong>
+        <div class="col-lg-12 text-end">
+            <a href="{% url 'checkout' %}" class="btn btn-primary mb-5">Proceed to Checkout</a>
+        </div>
+    </div>
+    {% else %}
+    <div class="container text-center mt-5">
+        <h3>No products found in your cart.</h3>
+        <p class="lead">Add items to your cart to view them here.</p>
+        <a href="{% url 'home' %}" class="btn btn-dark">Continue Shopping</a>
+    </div>
+    {% endif %}
+</div>
+
+<br><br>
+
+<script>
+$(document).on('click', '.update-cart', function(e) {  
+    e.preventDefault();  
+    var productid = $(this).data('index');  
+    var quantity = $('#select' + productid + ' option:selected').text();  
+   
+    if (quantity > 0) {  
+       $.ajax({  
+         type: 'POST',  
+         url: "{% url 'cart_update' %}",  
+         data: {  
+            product_id: productid,  
+            product_qty: quantity,  
+            csrfmiddlewaretoken: '{{ csrf_token }}',  
+            action: 'post',  
+         },  
+   
+         success: function(json){  
+            location.reload();  
+         },  
+   
+         error: function(xhr, errmsg, err) {  
+            console.error(xhr.responseText);  
+         }  
+       });  
+    } else {  
+       console.error('Invalid quantity');  
+    }  
+})
+
+$(document).on('click', '.delete-cart', function(e) {  
+   e.preventDefault();  
+   var productid = $(this).data('index');  
+  
+   $.ajax({  
+      type: 'POST',  
+      url: "{% url 'cart_delete' %}",  
+      data: {  
+        product_id: productid,  
+        csrfmiddlewaretoken: '{{ csrf_token }}',  
+        action: 'post',  
+      },  
+  
+      success: function(json){  
+        location.reload();  
+      },  
+  
+      error: function(xhr, errmsg, err) {  
+        console.error(xhr.responseText);  
+      }  
+   });  
+})
+</script>
+
+{% endblock %}
+{% block footer_wrapper %}
+
+{% endblock %}

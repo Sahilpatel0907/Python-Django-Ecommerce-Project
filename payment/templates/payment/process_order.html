@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Header -->
+<header class="bg-dark py-1">
+    <div class="container px-4 px-lg-5 my-2">
+        <div class="text-center text-white">
+            <h1 class="display-4 fw-bolder">Processing Order</h1>
+            <p class="lead fw-normal text-white-50 mb-0">Order Stuff</p>
+        </div>
+    </div>
+</header>
+
+<!-- Shipping Information -->
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+            <div class="card shadow-lg border-0 rounded-lg mb-4">
+                <div class="card-header"><strong>
+                    Shipping Information</strong>
+                </div>
+                <div class="card-body">
+                    <p>Name : {{ shipping_info.shipping_full_name }}</p>
+                    <p>Address 1 : {{ shipping_info.shipping_address1 }}</p>
+                    <p>Address 2 : {{ shipping_info.shipping_address2 }}</p>
+                    <p>City : {{ shipping_info.shipping_city }}</p>
+                    <p>State : {{ shipping_info.shipping_state }}</p>
+                    <p>Zip Code : {{ shipping_info.shipping_zipcode }}</p>
+                    <p>Country : {{ shipping_info.shipping_country }}</p>
+                    <a href="{% url 'update_info' %}" class="btn btn-info">Update Info</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Billing Information -->
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+            <div class="card shadow-lg border-0 rounded-lg mb-4">
+                <div class="card-header"><strong>
+                    Billing Information</strong>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'process_order' %}">
+                        {% csrf_token %}
+                        {{ billing_form.as_p }}
+                        
+                        <!-- Cart Summary -->
+                        <div class="table-responsive mt-4">
+                            <table class="table table-bordered">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>Item</th>
+                                        <th>Quantity</th>
+                                        <th>Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for product in cart_products %}
+                                    <tr>
+                                        <td>{{ product.name }}</td>
+                                        {% for key, value in quantities.items %}
+                                            {% if key == product.id|slugify %}
+                                                <td>{{ value }}</td>
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% if product.is_sale %}
+                                        <td>₹ {{ product.sale_price|floatformat:2 }}</td>
+                                        {% else %}
+                                        <td>₹ {{ product.price|floatformat:2 }}</td>
+                                        {% endif %}
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Total Summary -->
+                        <div class="mt-4 text-right">
+                            <h6 class="font-weight-bold">Subtotal: ₹ {{ totals|floatformat:2 }}</h6>
+                            <h6 class="font-weight-bold">Shipping: ₹ {{ order.shipping_fee|floatformat:2 }}</h6>
+                            <h5 class="font-weight-bold">Total: ₹ {{ totals|floatformat:2 }}</h5>
+                        </div>
+                        <div class="text-center mt-5">
+                            <button type="submit" class="btn btn-primary">Pay Now</button>
+                            <a href="{% url 'cart_summary' %}" class="btn btn-warning">Back To Cart</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.mt-4 h5 {
+    color: #28a745; /* A green color for the total */
+}
+.mt-4 h6 {
+    color: #6c757d; /* A gray color for subtotal and shipping */
+}
+</style>
+
+{% endblock %}
+{% block footer_wrapper %}
+
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12 text-center">
+            <h3 class="mb-4 font-weight-bold text-primary">Un-Shipped Items</h3>
+            <div class="table-responsive">
+                <table class="table table-hover table-custom">
+                    <thead class="thead-dark">
+                      <tr>
+                        <th scope="col">Order</th>
+                        <th scope="col">Price</th>
+                        <th scope="col">Customer Email</th>
+                        <th scope="col">Order Date</th>
+                        <th scope="col">Shipped</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in orders %}
+                      <tr>
+                        <td><a href="{% url 'orders' item.id %}">{{ item.id }}</a></td>
+                        <td>₹ {{ item.amount_pay }}</td>
+                        <td>{{ item.email }}</td>
+                        <td>{{ item.order_date }}</td>
+                        <td>
+                            <form method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="shipping_status" value="true">
+                                <input type="hidden" name="num" value="{{ item.id }}">
+                                <button type="submit" class="btn btn-success btn-sm">Mark as Shipped</button>
+                            </form>
+                        </td>
+                      </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .table-custom {
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    .table-custom th, .table-custom td {
+        vertical-align: middle;
+    }
+    .table-custom th {
+        background-color: #343a40;
+        color: #ffffff;
+    }
+    .table-custom tbody tr {
+        transition: background-color 0.3s, transform 0.2s;
+    }
+    .table-custom tbody tr:hover {
+        background-color: #e9ecef; /* Light gray on hover */
+        transform: scale(1.02); /* Slight scale effect */
+    }
+    .table-custom tbody tr:nth-child(odd) {
+        background-color: #ced4da; /* Darker background for odd rows */
+    }
+    .table-custom tbody tr:nth-child(even) {
+        background-color: #f8f9fa; /* Light background for even rows */
+    }
+</style>
+
+{% endblock %}
+
+{% block footer_wrapper %}
+
+{% endblock %}

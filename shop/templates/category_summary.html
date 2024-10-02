@@ -1,0 +1,35 @@
+{% extends 'base.html' %}  
+  
+{% block content %}  
+  
+<!-- Header -->  
+<header class="bg-dark py-5">  
+   <div class="container px-4 px-lg-5 my-5">  
+      <div class="text-center text-white">  
+        <h1 class="display-4 fw-bolder">Categories...</h1>  
+        <p class="lead fw-normal text-white-50 mb-0">Choose Your Category</p>  
+      </div>  
+   </div>  
+</header>  
+  
+<!-- Categories List -->  
+<div class="container">  
+   <div class="row justify-content-center">  
+      <div class="col-md-8 mt-3 mb-5">  
+        <h2 class="mb-3">Categories</h2>  
+        <ul class="list-group">  
+           {% for category in categories %}  
+           <li class="list-group-item">  
+              <a href="{% url 'category' category %}" class="text-decoration-none">{{ category }}</a>  
+           </li>  
+           {% endfor %}  
+        </ul>  
+      </div>  
+   </div>
+</div>
+
+{% endblock %}
+
+{% block footer_wrapper %}
+
+{% endblock %}

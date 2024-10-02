@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- Header-->
+<header class="bg-dark py-3">
+    <div class="container px-4 px-lg-5 my-5">
+        <div class="text-center text-white">
+            <h1 class="display-4 fw-bolder">Update User Profile</h1>
+            <p class="lead fw-normal text-white-50 mb-0">Update To User Account Information...</p>
+        </div>
+    </div>
+</header>
+
+<!-- Registration Form -->
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <form method="post" action="{% url 'update_user' %}">
+                        {% csrf_token %}
+                        {{ user_form.as_p }}
+                        <a href="{% url 'update_password' %}" class="btn btn-light mt-3">Change Password</a>
+                        <button type="submit" class="btn btn-secondary mt-3">Update</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block footer_wrapper %}
+
+{% endblock %}

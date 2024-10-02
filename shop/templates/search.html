@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    {% if not products %}
+        <h1 class="text-center">Search Results...</h1>
+    {% else %}
+        <h1 class="text-center mb-4">Search Results for "{{ query }}"</h1>
+        <ul class="list-group">
+            {% for product in products %}
+                <li class="list-group-item d-flex justify-content-between align-items-start">
+                    <div>
+                        <h3 class="mt-1 mb-3">{{ product.name }}</h3>
+                        <p><strong>Category:</strong> {{ product.category.name }}</p>
+                        <p><strong>Price:</strong> ₹ {{ product.price }}</p>
+                        <p><strong>Description:</strong> {{ product.description|safe }}</p>
+                        <p><strong>Is on Sale:</strong> {{ product.is_sale|yesno:"Yes,No" }}</p>
+                        {% if product.is_sale %}
+                            <p><strong>Sale Price:</strong> ₹ {{ product.sale_price }}</p>
+                        {% endif %}
+                        <a href="{% url 'home' %}" class="btn btn-dark">Home</a>
+                        <button type="button" value="{{ product.id }}" class="btn btn-dark add-cart">Add To Cart</button>
+                    </div>
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-thumbnail" width="30%">
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    {% if not products %}
+        <p class="text-center mt-5">No results found for "{{ query }}".</p>
+    {% endif %}
+</div>
+<script>
+    $(document).on('click', '.add-cart', function(e) {
+        e.preventDefault();
+
+        let productId = $(this).val();
+        let productQty = $('#qty-cart option:selected').text();
+
+        if (!productQty || isNaN(productQty) || productQty <= 0) {
+        productQty = 1;
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: "{% url 'cart_add' %}",
+            data: {
+                product_id: productId,
+                product_qty: productQty,
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                action: 'post',
+            },
+            success: function(json) {
+                document.getElementById('cart_quantity').textContent = json.qty;
+                location.reload(); // Reload to update the cart display
+            },
+            error: function(xhr, errmsg, err) {
+                console.error(xhr.status + ": " + xhr.responseText);
+                alert("An error occurred: " + xhr.responseText); // Debugging
+            },
+        });
+    });
+</script>
+{% endblock %}
+
+{% block footer_wrapper %}
+
+{% endblock %}
